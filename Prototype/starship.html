@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        background-size: 100%;
+        background-image: url('http://apod.nasa.gov/apod/image/0010/ngc205_cfht_big.jpg');
+      }
+      canvas { width: 100%; height: 100% }
+    </style>
+  </head>
+  <body>
+    <script src="three.js"></script>
+    <script src="solids-pattern.js"></script>
+    <script src="federation-pattern.js"></script>
+
+    <script>
+      var scene = new THREE.Scene();
+      var ambientLight = new THREE.AmbientLight(0x555555);
+      scene.add(ambientLight);
+      light = new THREE.SpotLight(0xffffff);
+      light.position.set(1000, 2000, 1000);
+      scene.add(light);
+
+      var camera = new THREE.PerspectiveCamera(75,
+            window.innerWidth/window.innerHeight,
+            0.1, 10000);
+
+      var renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0xffffff, 0);
+      document.body.appendChild(renderer.domElement);
+
+      var materialColor = new THREE.Color();
+      //materialColor.setRGB( 0.2, 0.5, 0.8 );
+      //materialColor.setRGB(0.875, 0.875, 0.875);
+      materialColor.setRGB(0.57, 0.578, 0.492);
+      var material = new THREE.MeshPhongMaterial( {
+          color: materialColor,
+          specular: 0x0,
+          shading: THREE.SmoothShading,
+          side: THREE.DoubleSide
+      } );
+
+
+
+      var starship = solids.getAStarship(material);
+      starship.render(scene)
+
+
+      camera.zoom = 10;
+      var scale = starship.scale();
+      var rho = scale * camera.zoom;
+      camera.position.z = rho;
+      camera.rotation.x = -0.3;
+      camera.rotation.y = 0.3;
+      var render = function () {
+        requestAnimationFrame( render );
+        camera.rotation.y += 0.002;
+        camera.rotation.z += 0.002;
+
+        camera.position.z = rho * Math.cos(-camera.rotation.x) *
+            Math.cos(camera.rotation.y);
+        camera.position.y = rho * Math.sin(-camera.rotation.x) *
+            Math.cos(camera.rotation.y);
+        camera.position.x = rho * Math.sin(camera.rotation.y);
+        camera.updateProjectionMatrix();
+
+        renderer.render(scene, camera);
+      };
+
+      render();
+    </script>
+  </body>
+</html>
